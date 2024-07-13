@@ -70,7 +70,7 @@ contract Wallet is OwnableUpgradeable, NoncesUpgradeable, ERC721Holder {
         __Ownable_init(_owner);
     }
 
-    function chauxCall(
+    function casaCall(
         CasaCall calldata call,
         bytes32 feeHash,
         bytes calldata signature
@@ -79,30 +79,30 @@ contract Wallet is OwnableUpgradeable, NoncesUpgradeable, ERC721Holder {
         if (call.from != address(this)) revert BadFrom();
         if (call.nonce != _useNonce(address(this))) revert BadNonce();
         if (msg.sender != owner()) {
-            bytes32 chauxHash = calculateCasaHash(
+            bytes32 casaHash = calculateCasaHash(
                 calculateCallHash(call),
                 feeHash
             );
-            if (chauxHash.recover(signature) != owner()) revert BadSignature();
+            if (casaHash.recover(signature) != owner()) revert BadSignature();
         }
 
         call.to.functionCallWithValue(call.data, call.value);
     }
 
-    function chauxFee(
+    function casaFee(
         CasaFee calldata fee,
         bytes32 callHash,
         bytes calldata signature
     ) external {
-        bytes32 chauxHash = calculateCasaHash(callHash, calculateFeeHash(fee));
+        bytes32 casaHash = calculateCasaHash(callHash, calculateFeeHash(fee));
 
         if (fee.from != address(this)) revert BadFrom();
         if (fee.chainId != block.chainid) revert BadChainId();
-        if (callPaid[chauxHash]) revert AlreadyPaid();
-        if (msg.sender != owner() && chauxHash.recover(signature) != owner())
+        if (callPaid[casaHash]) revert AlreadyPaid();
+        if (msg.sender != owner() && casaHash.recover(signature) != owner())
             revert BadSignature();
 
-        callPaid[chauxHash] = true;
+        callPaid[casaHash] = true;
         if (fee.token == 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE) {
             Address.sendValue(payable(fee.recipient), fee.amount);
         } else {
