@@ -6,7 +6,7 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {Wallet} from "./Wallet.sol";
 
-contract SmartFactory {
+contract Factory {
     Wallet public implementation;
 
     constructor() {
