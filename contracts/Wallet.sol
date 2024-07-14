@@ -70,6 +70,14 @@ contract Wallet is OwnableUpgradeable, NoncesUpgradeable, ERC721Holder {
         __Ownable_init(_owner);
     }
 
+    function operatorCall(CasaCall calldata call) external {
+        if (call.chainId != block.chainid) revert BadChainId();
+        if (call.from != address(this)) revert BadFrom();
+        if (call.nonce != _useNonce(address(this))) revert BadNonce();
+
+        call.to.functionCallWithValue(call.data, call.value);
+    }
+
     function casaCall(
         CasaCall calldata call,
         bytes32 feeHash,

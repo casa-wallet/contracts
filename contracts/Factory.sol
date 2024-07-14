@@ -14,10 +14,19 @@ contract Factory {
         implementation.initialize(address(this));
     }
 
+    function createWalletAndCall(
+        address owner,
+        uint256 index,
+        Wallet.CasaCall calldata call
+    ) external returns (address wallet) {
+        wallet = createWallet(owner, index);
+        Wallet(payable(wallet)).operatorCall(call);
+    }
+
     function createWallet(
         address owner,
         uint256 index
-    ) external returns (address wallet) {
+    ) public returns (address wallet) {
         wallet = Clones.cloneDeterministic(
             address(implementation),
             keccak256(abi.encodePacked(index, owner))
@@ -34,10 +43,6 @@ contract Factory {
             keccak256(abi.encodePacked(index, owner))
         );
 
-        uint256 size;
-        assembly {
-            size := extcodesize(wallet)
-        }
-        exists = size > 0;
+        exists = wallet.code.length > 0;
     }
 }
